@@ -1,6 +1,7 @@
 package com.shortenurl.service;
 
 import com.shortenurl.model.ShortUrl;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -16,25 +17,29 @@ public class ShortUrlService {
 
     /* Variables */
     private final Map<String, ShortUrl> shortUrlList = new HashMap<>();
-
-    /* Set HTML for home function */
-    public String loadIndex() { return "index";}
+    private UrlValidator validator = new UrlValidator(new String[]{"http","https"});
 
     /* Functions to create the random links and store then */
     public ResponseEntity<Object> shrink(ShortUrl shortenUrl) {
-        String randomChar = this.getRandomChars();
-        this.createShortUrl(randomChar, shortenUrl);
-        return new ResponseEntity<>(shortenUrl, HttpStatus.OK);
+        if(validator.isValid(shortenUrl.getFullUrl())) {
+            String randomChar = this.getRandomChars();
+            this.createShortUrl(randomChar, shortenUrl);
+            return new ResponseEntity(shortenUrl, HttpStatus.OK);
+        }
+        shortenUrl.setShortenedUrl("insira URL válida");
+        return new ResponseEntity(shortenUrl, HttpStatus.OK);
+
     }
 
     private String getRandomChars() {
-        StringBuilder randomStr = new StringBuilder();
+        String randomStr = "";
         String possibleChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-        for(int i = 0; i < 5; ++i)
-        { randomStr.append(possibleChars.charAt((int) Math.floor(Math.random() * (double) possibleChars.length()))); }
+        for(int i = 0; i < 5; ++i) {
+            randomStr = randomStr + possibleChars.charAt((int)Math.floor(Math.random() * (double)possibleChars.length()));
+        }
 
-        return randomStr.toString();
+        return randomStr;
     }
 
     private void createShortUrl(String randomChar, ShortUrl shortenUrl) {
@@ -45,6 +50,6 @@ public class ShortUrlService {
 
     /* Redirect function to retrieve the long URL*/
     public void redirect(HttpServletResponse response, @PathVariable("randomstring") String randomString) throws IOException {
-        response.sendRedirect(this.shortUrlList.get(randomString).getFullUrl());
+        response.sendRedirect(((ShortUrl)this.shortUrlList.get(randomString)).getFullUrl());
     }
 }
