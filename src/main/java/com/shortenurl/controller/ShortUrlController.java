@@ -2,6 +2,8 @@ package com.shortenurl.controller;
 
 import com.shortenurl.model.ShortUrl;
 import com.shortenurl.service.ShortUrlService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,12 +11,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RestController
+@RequiredArgsConstructor
 public class ShortUrlController {
 
 	private final ShortUrlService shortUrlService;
-	public ShortUrlController(ShortUrlService shortUrlService) { this.shortUrlService = shortUrlService; }
-
-
 
 	@GetMapping("/thiswork")
 	public String thiswork(){
@@ -22,8 +22,8 @@ public class ShortUrlController {
 	}
 
 	@PostMapping("/shrink")
-	public ResponseEntity<Object> shrink(@RequestBody ShortUrl shortUrl) {
-		return shortUrlService.shrink(shortUrl);
+	public ResponseEntity<String> shrink(@RequestParam String fullUrl) {
+		return new ResponseEntity<>(shortUrlService.shrink(fullUrl), HttpStatus.CREATED);
 	}
 
 	@GetMapping("/s/{randomString}")
