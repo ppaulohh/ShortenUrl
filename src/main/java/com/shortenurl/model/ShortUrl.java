@@ -1,5 +1,6 @@
 package com.shortenurl.model;
 
+import com.shortenurl.DTO.ShortUrlDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,4 +26,9 @@ public class ShortUrl {
 		this.fullUrl = fullUrl;
 		this.shortenedUrl = shortenedUrl;
 	}
+
+	public ShortUrlDTO toDTO(){
+		return new ShortUrlDTO(this.shortenedUrl,this.fullUrl);
+	}
+
 }
